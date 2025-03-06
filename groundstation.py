@@ -1,7 +1,9 @@
-import firebase_admin
 from firebase_admin import db, credentials
 from dotenv import load_dotenv
+import firebase_admin
+
 import os
+import serial
 
 load_dotenv()
 
@@ -16,6 +18,50 @@ firebase_admin.initialize_app(cred, {"databaseURL": DATABASE_URL})
 
 ref = db.reference("/")
 print(ref.get())
+
+SERIAL_PORT = 'COM3'  # COM3 if Windows, /dev/ttyUSB0 if Linux
+BAUD_RATE = 38400
+
+ser = serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE)
+
+"""
+data in following form:
+# timestamp_ms;pressure_hPa;insideTemperature_C;outsideTemperature_C;UV_candela;ozone_ppm;gyro_x;gyro_y;gyro_z
+"""
+
+def addToFirebase(line):
+    line = line.split(";")
+    print(line)
+    timestamp = line[0] # ms
+    pressure = line[1]  # hPa
+    insideTemp = line[2]    # degree C
+    outsideTemp = line[3]   # degree C
+    uv = line[4]    # candela
+    ozone = line[5] # ppm
+    gyroX = line[6]
+    gyroY = line[7]
+    gyroZ = line[8]
+
+    # ref.update({
+    # 'sensordata/temperature': 'Brilliant Albert',
+    # 'sensordata/': 'Amazing Mike'
+    # })
+
+    print(timestamp, gyroY)
+
+    
+
+while True:
+    try:
+        lineBinary = ser.readline()
+        line = lineBinary.decode('ascii')
+        line = line.replace("\n", "")
+        print(line)
+
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt")
+        break
+
 
 """
 ref = db.referenece('sensordata/temperature')
