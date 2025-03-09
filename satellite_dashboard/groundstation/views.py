@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .services.firebase_service import FirebaseService
+from groundstation.services.firebase_service import FirebaseService
 import json
 
 # Create Firebase service instance
