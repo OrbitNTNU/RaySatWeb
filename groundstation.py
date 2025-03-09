@@ -19,18 +19,29 @@ firebase_admin.initialize_app(cred, {"databaseURL": DATABASE_URL})
 ref = db.reference("/")
 print(ref.get())
 
-SERIAL_PORT = 'COM3'  # COM3 if Windows, /dev/ttyUSB0 if Linux
+
+SERIAL_PORT = 'COM3' # COM3 if Windows, /dev/ttyUSB0 if Linux
 BAUD_RATE = 38400
 
-ser = serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE)
+
+try:
+    ser = serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE)
+except serial.SerialException as e:
+    print(f"Error opening serial port {SERIAL_PORT}: {e}")
+    exit()
 
 """
-data in following form:
-# timestamp_ms;pressure_hPa;insideTemperature_C;outsideTemperature_C;UV_candela;ozone_ppm;gyro_x;gyro_y;gyro_z
+data in format:
+timestamp_ms;pressure_hPa;insideTemperature_C;outsideTemperature_C;UV_candela;ozone_ppm;gyro_x;gyro_y;gyro_z
 """
 
 def addToFirebase(line):
-    line = line.split(";")
+    data = line.split(";")
+    if len(data) != 9:
+        print("Invalid data format!")
+        return
+    
+    timestamp, pressure, inside_temp, outside_temp, uv, ozone, gyro_x, gyro_y, gyro_z = data
     print(line)
     timestamp = line[0] # ms
     pressure = line[1]  # hPa
@@ -42,14 +53,24 @@ def addToFirebase(line):
     gyroY = line[7]
     gyroZ = line[8]
 
-    # ref.update({
-    # 'sensordata/temperature': 'Brilliant Albert',
-    # 'sensordata/': 'Amazing Mike'
-    # })
+    data_entry = {
+        'timestamp': timestamp,
+        'pressure': pressure,
+        'insideTemp': insideTemp,
+        'outsideTemp': outsideTemp,
+        'uv': uv,
+        'ozone': ozone,
+        'gyroX': gyroX,
+        'gyroY': gyroY,
+        'gyroZ': gyroZ
+    }
 
-    print(timestamp, gyroY)
-
+    readings_ref = ref.child('sensordata')
+    readings_ref.child(timestamp).set(data_entry)
     
+    # Gets latest data
+    ref.child('latest').set(data_entry)
+
 
 while True:
     try:
@@ -60,6 +81,7 @@ while True:
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
+        ser.close()
         break
 
 
