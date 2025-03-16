@@ -154,8 +154,9 @@
     }
     
     // Function to initialize all charts
+    // Function to initialize all charts
     function initializeCharts() {
-        // Temperature chart
+        // Temperature chart (already implemented)
         const tempCtx = document.getElementById('temperatureChart').getContext('2d');
         charts.temperature = new Chart(tempCtx, {
             type: 'line',
@@ -163,15 +164,142 @@
                 labels: [],
                 datasets: [
                     {
-                        label: 'Inside Temp (°C)',
+                        label: 'Inside Temp [°C]',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        data: [],
+                        yAxisID: 'y-indoors'
+                    },
+                    {
+                        label: 'Outside Temp [°C]',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        data: [],
+                        yAxisID: 'y-outdoors'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    'y-outdoors': {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Outdoors [°C]'
+                        }
+                    },
+                    'y-indoors': {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Indoors [°C]'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Pressure chart
+        const pressureCtx = document.getElementById('pressureChart').getContext('2d');
+        charts.pressure = new Chart(pressureCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Pressure [hPa]',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        data: []
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+        
+        // UV & Ozone chart
+        const uvOzoneCtx = document.getElementById('uvOzoneChart').getContext('2d');
+        charts.uvOzone = new Chart(uvOzoneCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'UV [candela]',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        data: [],
+                        yAxisID: 'y-uv'
+                    },
+                    {
+                        label: 'Ozone [ppm]',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        data: [],
+                        yAxisID: 'y-ozone'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    'y-uv': {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'UV [candela]'
+                        }
+                    },
+                    'y-ozone': {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Ozone [ppm]'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gyroscope chart
+        const gyroCtx = document.getElementById('gyroChart').getContext('2d');
+        charts.gyro = new Chart(gyroCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'X-axis',
                         borderColor: 'rgba(255, 99, 132, 1)',
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         data: []
                     },
                     {
-                        label: 'Outside Temp (°C)',
+                        label: 'Y-axis',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        data: []
+                    },
+                    {
+                        label: 'Z-axis',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         data: []
                     }
                 ]
@@ -182,18 +310,67 @@
             }
         });
         
-        // Initialize other charts (pressure, UV, ozone, gyro) similarly
-        // ...
+        // Height chart
+        const heightCtx = document.getElementById('heightChart').getContext('2d');
+        charts.height = new Chart(heightCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Height [m]',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        data: []
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        
+        // Reaction Wheel Speed chart
+        const wheelSpeedCtx = document.getElementById('wheelSpeedChart').getContext('2d');
+        charts.wheelSpeed = new Chart(wheelSpeedCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Wheel Speed',
+                        borderColor: 'rgba(201, 203, 207, 1)',
+                        backgroundColor: 'rgba(201, 203, 207, 0.2)',
+                        data: []
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
     }
     
     // Function to update charts with new data
     function updateCharts(data) {
         console.log("Updating charts with data:", data);
         
-        // Format timestamps for display
+        // Function to format elapsed time from milliseconds
+        function formatElapsedTime(ms) {
+            if (ms === undefined || ms === null) return 'N/A';
+            
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            
+            return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
+        }
+        
+        // Format timestamps for display as elapsed time
         const timestamps = data.timestamps.map(ts => {
-            const date = new Date(parseInt(ts));
-            return date.toLocaleTimeString();
+            return formatElapsedTime(parseInt(ts));
         });
         
         // Update Temperature Chart
@@ -227,8 +404,34 @@
         charts.gyro.data.datasets[2].data = data.gyro.z;
         charts.gyro.update();
         
-        // Height and wheel speed charts omitted as they're not in your API response
-}
+        // Update Height Chart (if data exists)
+        if (data.height && data.height.some(h => h !== null)) {
+            console.log("Height chart update with:", data.height.length, "height points");
+            charts.height.data.labels = timestamps;
+            charts.height.data.datasets[0].data = data.height;
+            charts.height.update();
+        } else {
+            console.log("No height data available");
+            // Display a message in the chart
+            charts.height.data.labels = ['No Data'];
+            charts.height.data.datasets[0].data = [];
+            charts.height.update();
+        }
+        
+        // Update Wheel Speed Chart (if data exists)
+        if (data.wheel_speed && data.wheel_speed.some(w => w !== null)) {
+            console.log("Wheel Speed chart update with:", data.wheel_speed.length, "wheel speed points");
+            charts.wheelSpeed.data.labels = timestamps;
+            charts.wheelSpeed.data.datasets[0].data = data.wheel_speed;
+            charts.wheelSpeed.update();
+        } else {
+            console.log("No wheel speed data available");
+            // Display a message in the chart
+            charts.wheelSpeed.data.labels = ['No Data'];
+            charts.wheelSpeed.data.datasets[0].data = [];
+            charts.wheelSpeed.update();
+        }
+    }
 
 
     
