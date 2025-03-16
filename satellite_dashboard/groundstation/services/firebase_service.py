@@ -21,10 +21,8 @@ class FirebaseService:
         self.root_ref = db.reference("/")
         
     def get_latest_data(self):
-        """Fetch the latest sensor reading from Firebase"""
-        # Get the 'Latest' node directly
-        latest_data = self.root_ref.child('Latest').get()
-        return latest_data
+        """Fetch only the latest sensor reading"""
+        return self.root_ref.child('latest').get()
     
     def get_historical_data(self, limit=50):
         """Fetch historical sensor data for graphs"""
