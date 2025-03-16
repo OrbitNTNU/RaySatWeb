@@ -188,30 +188,49 @@
     
     // Function to update charts with new data
     function updateCharts(data) {
-        console.log("Chart data:", data);  // Debug log
+        console.log("Updating charts with data:", data);
         
-        if (!data || !data.timestamps || data.timestamps.length === 0) {
-            console.warn("No chart data available");
-            return;
-        }
-        
-        // Format timestamps for display (milliseconds since takeoff)
-        const timeLabels = data.timestamps.map(ts => {
-            const seconds = Math.floor(ts / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            return `${hours}h ${minutes % 60}m`;
+        // Format timestamps for display
+        const timestamps = data.timestamps.map(ts => {
+            const date = new Date(parseInt(ts));
+            return date.toLocaleTimeString();
         });
         
         // Update Temperature Chart
-        charts.temperature.data.labels = timeLabels;
+        console.log("Temperature chart update with:", timestamps.length, "labels and", 
+                    data.inside_temperature.length, "inside temp points,", 
+                    data.outside_temperature.length, "outside temp points");
+        charts.temperature.data.labels = timestamps;
         charts.temperature.data.datasets[0].data = data.inside_temperature;
         charts.temperature.data.datasets[1].data = data.outside_temperature;
         charts.temperature.update();
         
-        // Update other charts similarly
-        // ...
-    }
+        // Update Pressure Chart
+        console.log("Pressure chart update with:", data.pressure.length, "pressure points");
+        charts.pressure.data.labels = timestamps;
+        charts.pressure.data.datasets[0].data = data.pressure;
+        charts.pressure.update();
+        
+        // Update UV & Ozone Chart
+        console.log("UV & Ozone chart update with:", data.uv.length, "UV points,", data.ozone.length, "ozone points");
+        charts.uvOzone.data.labels = timestamps;
+        charts.uvOzone.data.datasets[0].data = data.uv;
+        charts.uvOzone.data.datasets[1].data = data.ozone;
+        charts.uvOzone.update();
+        
+        // Update Gyro Chart
+        console.log("Gyro chart update with:", data.gyro.x.length, "X points,", 
+                    data.gyro.y.length, "Y points,", data.gyro.z.length, "Z points");
+        charts.gyro.data.labels = timestamps;
+        charts.gyro.data.datasets[0].data = data.gyro.x;
+        charts.gyro.data.datasets[1].data = data.gyro.y;
+        charts.gyro.data.datasets[2].data = data.gyro.z;
+        charts.gyro.update();
+        
+        // Height and wheel speed charts omitted as they're not in your API response
+}
+
+
     
     // Function to fetch latest data
     async function fetchLatestData() {
