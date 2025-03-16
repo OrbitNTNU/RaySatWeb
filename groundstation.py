@@ -42,15 +42,15 @@ def addToFirebase(line):
         return
     
     timestamp, pressure, insideTemp, outsideTemp, uv, ozone, gyroX, gyroY, gyroZ = data
-    timestamp = data[0] # ms
-    pressure = data[1]  # hPa
-    insideTemp = data[2]    # degree C
-    outsideTemp = data[3]   # degree C
-    uv = data[4]    # candela
-    ozone = data[5] # ppm
-    gyroX = data[6]
-    gyroY = data[7]
-    gyroZ = data[8]
+    timestamp = float(data[0]) # ms
+    pressure = float(data[1])  # hPa
+    insideTemp = float(data[2])    # degree C
+    outsideTemp = float(data[3])   # degree C
+    uv = float(data[4])    # candela
+    ozone = float(data[5]) # ppm
+    gyroX = float(data[6])
+    gyroY = float(data[7])
+    gyroZ = float(data[8])
 
     data_entry = {
         'timestamp': timestamp,
