@@ -10,10 +10,14 @@ def dashboard(request):
     """Main dashboard view"""
     return render(request, 'groundstation/dashboard.html')
 
+# def get_latest_data(request):
+#     """API endpoint to get latest sensor data"""
+#     data = firebase_service.get_latest_data()
+#     return JsonResponse(data if data else {})
+
 def get_latest_data(request):
-    """API endpoint to get latest sensor data"""
-    data = firebase_service.get_latest_data()
-    return JsonResponse(data if data else {})
+    data = firebase_service.get_latest_data()  # Fetch data from Firebase
+    return JsonResponse(data if isinstance(data, dict) else data, safe=False)
 
 def get_historical_data(request):
     """API endpoint to get historical sensor data for graphs"""

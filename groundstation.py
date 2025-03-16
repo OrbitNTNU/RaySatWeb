@@ -41,17 +41,16 @@ def addToFirebase(line):
         print("Invalid data format!")
         return
     
-    timestamp, pressure, inside_temp, outside_temp, uv, ozone, gyro_x, gyro_y, gyro_z = data
-    print(line)
-    timestamp = line[0] # ms
-    pressure = line[1]  # hPa
-    insideTemp = line[2]    # degree C
-    outsideTemp = line[3]   # degree C
-    uv = line[4]    # candela
-    ozone = line[5] # ppm
-    gyroX = line[6]
-    gyroY = line[7]
-    gyroZ = line[8]
+    timestamp, pressure, insideTemp, outsideTemp, uv, ozone, gyroX, gyroY, gyroZ = data
+    timestamp = data[0] # ms
+    pressure = data[1]  # hPa
+    insideTemp = data[2]    # degree C
+    outsideTemp = data[3]   # degree C
+    uv = data[4]    # candela
+    ozone = data[5] # ppm
+    gyroX = data[6]
+    gyroY = data[7]
+    gyroZ = data[8]
 
     data_entry = {
         'timestamp': timestamp,
@@ -78,6 +77,7 @@ while True:
         line = lineBinary.decode('ascii')
         line = line.replace("\n", "")
         print(line)
+        addToFirebase(line)
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
