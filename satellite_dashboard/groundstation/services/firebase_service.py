@@ -105,10 +105,7 @@ class FirebaseService:
             result['gyro']['x'].append(reading.get('gyroX'))
             result['gyro']['y'].append(reading.get('gyroY'))
             result['gyro']['z'].append(reading.get('gyroZ'))
-            
-            # These fields might not exist in your current data structure,
-            # but included for future compatibility
-            result['height'].append(reading.get('height', None))
+            result['height'].append(reading.get('height'))
             result['wheel_speed'].append(reading.get('wheelSpeed', None))
         
         return result
@@ -132,7 +129,8 @@ class FirebaseService:
                 'pressure': [],
                 'uv': [],
                 'ozone': [],
-                'gyro': {'x': [], 'y': [], 'z': []}
+                'gyro': {'x': [], 'y': [], 'z': []},
+                'height': []
             }
         
         # Initialize result dictionary
@@ -143,7 +141,8 @@ class FirebaseService:
             'pressure': [],
             'uv': [],
             'ozone': [],
-            'gyro': {'x': [], 'y': [], 'z': []}
+            'gyro': {'x': [], 'y': [], 'z': []},
+            'height': []
         }
         
         # Sort data by timestamp (which is the key)
@@ -160,6 +159,7 @@ class FirebaseService:
             result['gyro']['x'].append(reading.get('gyroX'))
             result['gyro']['y'].append(reading.get('gyroY'))
             result['gyro']['z'].append(reading.get('gyroZ'))
+            result['height'].append(reading.get('height'))
         
         return result
     
