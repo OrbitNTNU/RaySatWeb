@@ -15,9 +15,14 @@ load_dotenv()
 
 """
 data in format:
-callsign;timestamp_ms;pressure_hPa;insideTemperature_C;outsideTemperature_C;UV_candela;ozone_ppm;gyro_x;gyro_y;gyro_z;height
+callsign;timestamp_ms;pressure_hPa;insideTemperature_C;outsideTemperature_C;UV_candela;ozone_ppm;height;rwoffon;rwmanual
+
+(nvm no gyro)
+
+test datastring:
+"LA9ORB;104912;1000;23;24;0;30;100;on;off"
+
 """
-"LA9ORB;104912;1000;23;24;0;30;0.2;0.3;-0.1;100"
 
 
 GCP_PROJECT_ID = os.getenv('projectID')
@@ -64,10 +69,9 @@ def add_to_firebase(data_list):
     outsideTemp = float(data_list[3])  # degree C
     uv = float(data_list[4])  # candela
     ozone = float(data_list[5])  # ppm
-    gyroX = float(data_list[6])
-    gyroY = float(data_list[7])
-    gyroZ = float(data_list[8])
-    height = float(data_list[9])
+    height = float(data_list[6])
+    rwstate = str(data_list[7])
+    rwmanual = str(data_list[8])
 
     data_entry = {
         'timestamp': timestamp,
@@ -76,10 +80,9 @@ def add_to_firebase(data_list):
         'outsideTemp': outsideTemp,
         'uv': uv,
         'ozone': ozone,
-        'gyroX': gyroX,
-        'gyroY': gyroY,
-        'gyroZ': gyroZ,
-        'height': height
+        'height': height,
+        'rwstate': rwstate,
+        'rwmanual': rwmanual,
     }
 
     readings_ref = ref.child('sensordata')
@@ -127,18 +130,19 @@ while True:
 
             readings_ref = ref.child('owldata')
             readings_ref.child(str(current_time)).set(ngham_spp_packet_decoded)
-            print(current_time)
             
             print("Decoded NGHam-SPP Packet:")
             # print(json.dumps(ngham_spp_packet_decoded, indent=2))
             # print(json.dumps(ngham_spp_packet_decoded["spp_payload"]["data"], indent=2))
-            
-            if ngham_spp_packet_decoded["spp_payload"]["data"]["ngham_flags"] == "0x0":
-                sensor_data = ngham_spp_packet_decoded["spp_payload"]["data"]["rx_payloads"].get("sensor_data")
-                if sensor_data:
-                    print(sensor_data)
-                    add_to_firebase(sensor_data)
-                    
+            # print(type(ngham_spp_packet_decoded["spp_payload"]["data"]))
+            try:
+                if ngham_spp_packet_decoded["spp_payload"]["data"]["ngham_flags"] == "0x0":
+                    sensor_data = ngham_spp_packet_decoded["spp_payload"]["data"]["rx_payloads"].get("sensor_data")
+                    if sensor_data:
+                        print(sensor_data)
+                        add_to_firebase(sensor_data)
+            except:
+                continue        
 
         else:
             print("No NGHam-SPP Frame Start")
@@ -146,6 +150,4 @@ while True:
             sys.stdout.flush()
 
     except KeyboardInterrupt:
-        print("KeyboardInterrupt")
-        ser.close()
-        break
+        print("continue")
